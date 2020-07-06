@@ -19,7 +19,7 @@ class TwitchSkill(Skill):
     """Opsdroid skill to integrate with twitch and game."""
     def __init__(self, opsdroid, config, *args, **kwargs):
         super().__init__(opsdroid, config, *args, **kwargs)
-        self.connector = self.opsdroid.get_connector('shell')
+        self.connector = self.opsdroid.get_connector('twitch')
         self.joined_users = []
 
     async def create_character(self, name):
