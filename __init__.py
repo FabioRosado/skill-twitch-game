@@ -8,7 +8,8 @@ from opsdroid.connector.twitch.events import (
     UserFollowed,
     UserJoinedChat,
     UserSubscribed,
-    UserGiftedSubscription
+    UserGiftedSubscription,
+    UserLeftChat
         )
 
 
@@ -24,7 +25,7 @@ class TwitchSkill(Skill):
 
     async def create_character(self, name):
         """Creates character for user."""
-        character = {
+        character_attributes = {
                 "name": name, 
                 "class": "adventurer", 
                 "gold": 0, 
@@ -39,17 +40,19 @@ class TwitchSkill(Skill):
                     } 
                 }
 
-        characters_list = await self.opsdroid.memory.get("characters")
-        characters_list[name] = character
+        await self.opsdroid.memory.put(name, character_attributes)
 
-        await self.opsdroid.memory.put("characters", characters_list)
+        test = await self.opsdroid.memory.get(name)
+
+        _LOGGER.info(f"created {test}")
 
     async def add_gold(self, name, amount=1):
         """Add gold to the user character sheet."""
-        characters = await self.opsdroid.memory.get("characters")
+        character = await self.opsdroid.memory.get(name)
 
-        if characters.get(name):
-            characters[name]["gold"] += amount
+        if character:
+            character["gold"] += amount
+            await self.opsdroid.memory.put(name, character)
             return
         await self.create_character(name)
 
